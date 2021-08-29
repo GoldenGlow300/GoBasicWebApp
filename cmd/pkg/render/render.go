@@ -7,28 +7,40 @@ import (
 	"net/http"
 	"path/filepath"
 	"text/template"
+
+	"github.com/GoldenGlow300/mytestapp/cmd/pkg/config"
 )
 
 var functions = template.FuncMap{}
 
+var app *config.AppConfig
+
+//newTemplates sets the config for the template package
+func NewTemplates(a *config.AppConfig) {
+	app = a
+}
+
 //This renders the templates that were created, this func is called in the corresponding page functions
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
+	var tc map[string]*template.Template
 
-	tc, err := CreateTemplateCache()
-	if err != nil {
-		log.Fatal(err)
+	if app.UseCache {
+		//get the template cache from the app config instead of rerendering the cache reapeatedly
+		tc = app.TemplateCache
+	} else {
+		tc, _ = CreateTemplateCache()
 	}
 
 	t, ok := tc[tmpl]
 	if !ok {
-		log.Fatal(err)
+		log.Fatal("Could not get template from template cache")
 	}
 
 	buf := new(bytes.Buffer)
 
 	_ = t.Execute(buf, nil)
 
-	_, err = buf.WriteTo(w)
+	_, err := buf.WriteTo(w)
 	if err != nil {
 		fmt.Println("Error writing template to browser", err)
 	}
