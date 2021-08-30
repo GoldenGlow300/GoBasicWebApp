@@ -15,7 +15,8 @@ func routes(app *config.AppConfig) http.Handler {
 	//middleware allows you to process a request and perform some action on it
 	//Ex. checking to see if the user is authenticated before responding to a request
 	mux.Use(middleware.Recoverer)
-	
+	mux.Use(WriteToConsole)
+	mux.Use(NoSurf)
 
 	mux.Get("/", handlers.Repo.Home)
 	mux.Get("/about", handlers.Repo.About)
