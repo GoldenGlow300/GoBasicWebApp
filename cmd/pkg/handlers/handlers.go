@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/GoldenGlow300/mytestapp/cmd/pkg/config"
+
+	"github.com/GoldenGlow300/mytestapp/cmd/pkg/models"
 	"github.com/GoldenGlow300/mytestapp/cmd/pkg/render"
 )
 
@@ -31,10 +33,16 @@ func NewHandlers(r *Repository) {
 
 //Handles request and responses for the Home Page
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "home.page.tmpl")
+	render.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{})
 }
 
 // About is the about page handler
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "about.page.tmpl")
+	//perform some business logic
+	stringMap := make(map[string]string)
+	stringMap["test"] = "Hello, Again"
+
+	//send data to the template
+
+	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{StringMap: stringMap})
 }

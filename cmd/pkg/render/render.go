@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/GoldenGlow300/mytestapp/cmd/pkg/config"
+	"github.com/GoldenGlow300/mytestapp/cmd/pkg/models"
 )
 
 var functions = template.FuncMap{}
@@ -20,8 +21,12 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
+
 //This renders the templates that were created, this func is called in the corresponding page functions
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 
 	if app.UseCache {
@@ -38,8 +43,12 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 
 	buf := new(bytes.Buffer)
 
-	_ = t.Execute(buf, nil)
+	//setting default data that appears if nothing changes
+	td = AddDefaultData(td)
 
+	_ = t.Execute(buf, td)
+
+	//the template thats written to the buffer, will then write to the pages responder
 	_, err := buf.WriteTo(w)
 	if err != nil {
 		fmt.Println("Error writing template to browser", err)
